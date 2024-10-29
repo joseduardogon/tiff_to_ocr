@@ -70,3 +70,12 @@ if __name__ == "__main__":
 # Comando para converter o script em um executável usando pyinstaller
 # No terminal, execute o seguinte comando:
 # pyinstaller --onefile --name tiff_to_pdf_converter script.py
+# O executável será criado no diretório "dist" dentro do diretório atual.
+'''
+Este script Python é um exemplo simples que solicita ao usuário os caminhos para a pasta de entrada e saída, valida esses caminhos e, em seguida, converte arquivos TIFF para PDF com OCR usando o PDF24. Ele mantém a estrutura dos diretórios de entrada ao salvar os arquivos PDF de saída.
+
+Para executar o script, você precisa ter o Python instalado em seu sistema e o módulo `subprocess`. Você também precisa ter o PDF24 OCR instalado em seu sistema e configurar o caminho correto para o executável `pdf24-Ocr.exe` no script.
+
+Você pode converter este script em um executável usando o PyInstaller para facilitar a execução em sistemas sem Python instalado. Basta seguir as instruções fornecidas no comentário no final do script.
+
+Espero que este exemplo seja útil para você. Se precisar de mais ajuda ou esclarecimentos, sinta-se à vontade para perguntar. Boa sorte com o seu projeto'''

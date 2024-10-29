@@ -1,5 +1,7 @@
 import os
 import subprocess
+import time
+import datetime
 
 def get_user_input():
     """
@@ -26,9 +28,10 @@ def convert_tiff_to_pdf_with_ocr(input_folder, output_folder):
     """
     Converte arquivos TIFF para PDF com OCR usando o PDF24, mantendo a estrutura dos diretórios.
     """
+    count = 0
     for root, _, files in os.walk(input_folder):
         for file in files:
-            if file.lower().endswith(".tif"):
+            if file.lower().endswith(".tif") or file.lower().endswith(".tiff"):
                 # Caminho completo do arquivo de entrada
                 input_file = os.path.join(root, file)
 
@@ -50,13 +53,28 @@ def convert_tiff_to_pdf_with_ocr(input_folder, output_folder):
                 ]
 
                 try:
+                    start_time = time.time()
                     print(f"\nIniciando a conversão de '{input_file}' para '{output_file}' com OCR em português...")
                     subprocess.run(pdf24_command, check=True)
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    elapsed_time_str = str(datetime.timedelta(seconds=elapsed_time))
                     print(f"Conversão concluída: {output_file}")
+                    print(f"Tempo de processamento: {elapsed_time_str}")
+                    print(f"Arquivo: {file} | Diretório: {relative_path}")
+                    count += 1
+
+                    # Reiniciar o script após 50 arquivos processados
+                    if count % 50 == 0:
+                        print("\nReiniciando o processo para evitar travamentos...")
+                        time.sleep(5)  # Espera de 5 segundos antes de continuar
+                        return convert_tiff_to_pdf_with_ocr(input_folder, output_folder)
                 except subprocess.CalledProcessError as e:
                     print(f"Erro na conversão de '{input_file}': {e}")
                 except FileNotFoundError:
                     print("Erro: Caminho para o executável PDF24 está incorreto. Verifique e tente novamente.")
+                except Exception as e:
+                    print(f"Erro inesperado ao processar '{input_file}': {e}")
 
 if __name__ == "__main__":
     print("\nBem-vindo ao Conversor de TIFF para PDF com OCR (PDF24)\n")
@@ -69,11 +87,4 @@ if __name__ == "__main__":
 
 # Comando para converter o script em um executável usando pyinstaller
 # No terminal, execute o seguinte comando:
-# pyinstaller --onefile --name tiff_to_pdf_converter script.py
-'''
-
-Este script Python é um exemplo de como você pode automatizar a conversão de arquivos TIFF para PDF com OCR usando o PDF24. Ele solicita ao usuário os diretórios de entrada e saída, valida os caminhos fornecidos e, em seguida, percorre os arquivos TIFF na pasta de entrada, convertendo-os para PDF com OCR em português e mantendo a estrutura de diretórios.
-
-Para executar o script, você pode salvá-lo em um arquivo chamado `script.py` e executá-lo em um ambiente Python com o módulo `subprocess` instalado. Você também pode convertê-lo em um executável usando o `pyinstaller` para facilitar a execução em sistemas Windows.
-
-Lembre-se de substituir o caminho para o executável `pdf24-Ocr.exe` pelo caminho correto em seu sistema. Além disso, certifique-se de ter o PDF24 OCR instalado e configurado corretamente para que o script funcione corretamente.'''
+# pyinstaller --onefile --name tiff_to_pdf_converter tiff_to_pdf_ocr_conversion.py

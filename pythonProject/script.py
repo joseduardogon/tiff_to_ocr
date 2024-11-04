@@ -24,7 +24,7 @@ def validate_paths(input_folder, output_folder):
     os.makedirs(output_folder, exist_ok=True)
     return True
 
-def convert_tiff_to_pdf_with_ocr(input_folder, output_folder):
+def convert_tiff_to_pdf_with_ocr(input_folder, output_folder, processed_files=set()):
     """
     Converte arquivos TIFF para PDF com OCR usando o PDF24, mantendo a estrutura dos diretórios.
     """
@@ -34,6 +34,10 @@ def convert_tiff_to_pdf_with_ocr(input_folder, output_folder):
             if file.lower().endswith(".tif") or file.lower().endswith(".tiff"):
                 # Caminho completo do arquivo de entrada
                 input_file = os.path.join(root, file)
+
+                # Pula arquivos já processados
+                if input_file in processed_files:
+                    continue
 
                 # Diretório de saída correspondente ao diretório do arquivo TIFF
                 relative_path = os.path.relpath(root, input_folder)
@@ -54,21 +58,24 @@ def convert_tiff_to_pdf_with_ocr(input_folder, output_folder):
 
                 try:
                     start_time = time.time()
-                    print(f"\nIniciando a conversão de '{input_file}' para '{output_file}' com OCR em português...")
+                    print(f"\n\nMESSAGE: Iniciando a conversão de '{input_file}' para '{output_file}' com OCR em português...\n")
                     subprocess.run(pdf24_command, check=True)
                     end_time = time.time()
                     elapsed_time = end_time - start_time
                     elapsed_time_str = str(datetime.timedelta(seconds=elapsed_time))
-                    print(f"Conversão concluída: {output_file}")
-                    print(f"Tempo de processamento: {elapsed_time_str}")
-                    print(f"Arquivo: {file} | Diretório: {relative_path}")
+                    print(f"MESSAGE: Conversão concluída\n")
+                    print(f"MESSAGE: Tempo de processamento: {elapsed_time_str}\n\n")
+                    #print(f"Arquivo: {file} | Diretório: {relative_path}")
                     count += 1
 
+                    # Adiciona o arquivo processado ao conjunto
+                    processed_files.add(input_file)
+
                     # Reiniciar o script após 50 arquivos processados
-                    if count % 50 == 0:
-                        print("\nReiniciando o processo para evitar travamentos...")
+                    if count % 10 == 0:
+                        print("\n\n\nMESSAGE: Reiniciando o processo para evitar travamentos...\n\n\n")
                         time.sleep(5)  # Espera de 5 segundos antes de continuar
-                        return convert_tiff_to_pdf_with_ocr(input_folder, output_folder)
+                        return convert_tiff_to_pdf_with_ocr(input_folder, output_folder, processed_files)
                 except subprocess.CalledProcessError as e:
                     print(f"Erro na conversão de '{input_file}': {e}")
                 except FileNotFoundError:
